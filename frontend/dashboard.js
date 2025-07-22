@@ -216,14 +216,30 @@ function populateHotelSelects() {
             select.style.webkitTextFillColor = '#495057';
             select.style.textShadow = 'none';
             
-            // Force a repaint
+            // More aggressive styling approach
+            select.setAttribute('style', 'color: #495057 !important; background-color: white !important; -webkit-text-fill-color: #495057 !important;');
+            select.classList.add('force-visible-text');
+            
+            // Force browser to recalculate styles
             setTimeout(() => {
+                const options = select.querySelectorAll('option');
+                options.forEach(opt => {
+                    opt.setAttribute('style', 'color: #495057 !important; background-color: white !important; -webkit-text-fill-color: #495057 !important;');
+                    opt.classList.add('force-visible-text');
+                });
+                
+                // Trigger a style recalculation
                 select.style.display = 'none';
                 select.offsetHeight; // Trigger reflow
                 select.style.display = '';
+                
+                // Apply styles one more time after reflow
                 select.style.color = '#495057';
                 select.style.webkitTextFillColor = '#495057';
-            }, 50);
+                
+                console.log('Hotel dropdown styled. Options count:', options.length);
+                console.log('First option text:', options[1]?.textContent, 'color:', window.getComputedStyle(options[1]).color);
+            }, 100);
         }
     });
 }

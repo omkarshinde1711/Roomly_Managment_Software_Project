@@ -105,6 +105,23 @@ form select#availHotel option {
     text-shadow: none !important;
 }
 
+/* Force visible text class for JavaScript application */
+.force-visible-text {
+    color: #495057 !important;
+    background-color: white !important;
+    -webkit-text-fill-color: #495057 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+
+.force-visible-text option {
+    color: #495057 !important;
+    background-color: white !important;
+    -webkit-text-fill-color: #495057 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
