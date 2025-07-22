@@ -3,61 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospitality Management System</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Roomly - Your hotel's command center. Simplified.</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="landing-page">
-    <div class="landing-container">
-        <div class="landing-card">
-            <div class="landing-header">
-                <h1 class="landing-title">🏨 Hospitality Management System</h1>
-                <p class="landing-subtitle">Modern Hotel Management Solution</p>
-                <p class="landing-description">
-                    Streamline your hotel operations with our comprehensive management system 
-                    featuring real-time room availability, reservation management, and automated billing.
-                </p>
-            </div>
-            
-            <div class="landing-actions">
-                <a href="login.html" class="btn btn-primary btn-large">
-                    <span class="btn-icon">�</span>
-                    <span class="btn-text">Staff Login</span>
-                </a>
-                <a href="dashboard.html" class="btn btn-secondary btn-large">
-                    <span class="btn-icon">📋</span>
-                    <span class="btn-text">Go to Dashboard</span>
-                </a>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-item">
-                    <div class="feature-icon">�</div>
-                    <h3>Real-time Availability</h3>
-                    <p>Check room availability instantly with smart conflict detection</p>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📋</div>
-                    <h3>Reservation Management</h3>
-                    <p>Complete booking lifecycle from reservation to check-out</p>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">�</div>
-                    <h3>Automated Billing</h3>
-                    <p>Generate bills automatically with detailed breakdowns</p>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🏢</div>
-                    <h3>Hotel Management</h3>
-                    <p>Manage multiple hotels and rooms with admin controls</p>
+<body class="login-page">
+    <div class="main-container">
+        <!-- Left Column - Roomly Info -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-brand">
+                        <div class="logo-container">
+                            <img src="assets/logo.png" alt="Roomly" class="hero-logo">
+                        </div>
+                        <h1 class="hero-title">Roomly</h1>
+                        <p class="hero-tagline">Your hotel's command center. Simplified.</p>
+                    </div>
+                    <div class="hero-description">
+                        <p>At Roomly, we believe managing your property should be as welcoming as the stay you provide for your guests. We've replaced clunky, outdated systems with a smart, intuitive platform designed to streamline your operations, boost your revenue, and free you up to focus on what truly matters: creating unforgettable guest experiences.</p>
+                    </div>
+                    <div class="hero-features">
+                        <div class="feature-item">✓ Real-time room availability</div>
+                        <div class="feature-item">✓ Streamlined reservation management</div>
+                        <div class="feature-item">✓ Automated billing system</div>
+                        <div class="feature-item">✓ Seamless guest check-in/out</div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="demo-info">
-                <h3>Demo Access</h3>
+        </div>
+
+        <!-- Right Column - Login Section -->
+        <div class="login-section">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-brand">
+                        <img src="assets/logo.png" alt="Roomly" class="login-logo">
+                        <div class="login-brand-text">
+                            <h2>Staff Portal</h2>
+                            <p>Access your Roomly dashboard</p>
+                        </div>
+                    </div>
+                </div>
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login">Sign In</button>
+                </form>
+                <div id="loginMessage" class="message"></div>
                 <div class="demo-credentials">
+                    <h4>Demo Access</h4>
                     <div class="credential-item">
                         <strong>Admin:</strong> admin / admin123
                     </div>
@@ -69,15 +70,11 @@
         </div>
     </div>
 
-    <script>
-        // Auto-redirect based on user login status
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedUser = localStorage.getItem('hospitalityUser');
-            if (savedUser) {
-                // If user is logged in, show dashboard link prominently
-                document.querySelector('a[href="dashboard.html"]').classList.add('btn-highlight');
-            }
-        });
-    </script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="auth.js"></script>
 </body>
 </html>

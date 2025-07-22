@@ -26,9 +26,19 @@ app.post('/api/login', async (req, res) => {
         const [rows] = await pool.execute('CALL sp_UserLogin(?, ?)', [username, password]);
         
         if (rows.length > 0 && rows[0].length > 0) {
+            const userData = rows[0][0];
+            
+            // Normalize the user data for frontend consistency
+            const normalizedUser = {
+                userID: userData.UserID,
+                username: userData.Username,
+                role: userData.Role,
+                name: userData.Username // Use username as display name
+            };
+            
             res.json({
                 success: true,
-                user: rows[0][0]
+                user: normalizedUser
             });
         } else {
             res.status(401).json({
