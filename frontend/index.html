@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitality Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="landing-page">
+    <div class="landing-container">
+        <div class="landing-card">
+            <div class="landing-header">
+                <h1 class="landing-title">🏨 Hospitality Management System</h1>
+                <p class="landing-subtitle">Modern Hotel Management Solution</p>
+                <p class="landing-description">
+                    Streamline your hotel operations with our comprehensive management system 
+                    featuring real-time room availability, reservation management, and automated billing.
+                </p>
+            </div>
+            
+            <div class="landing-actions">
+                <a href="login.html" class="btn btn-primary btn-large">
+                    <span class="btn-icon">�</span>
+                    <span class="btn-text">Staff Login</span>
+                </a>
+                <a href="dashboard.html" class="btn btn-secondary btn-large">
+                    <span class="btn-icon">📋</span>
+                    <span class="btn-text">Go to Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">�</div>
+                    <h3>Real-time Availability</h3>
+                    <p>Check room availability instantly with smart conflict detection</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <h3>Reservation Management</h3>
+                    <p>Complete booking lifecycle from reservation to check-out</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">�</div>
+                    <h3>Automated Billing</h3>
+                    <p>Generate bills automatically with detailed breakdowns</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🏢</div>
+                    <h3>Hotel Management</h3>
+                    <p>Manage multiple hotels and rooms with admin controls</p>
+                </div>
+            </div>
+            
+            <div class="demo-info">
+                <h3>Demo Access</h3>
+                <div class="demo-credentials">
+                    <div class="credential-item">
+                        <strong>Admin:</strong> admin / admin123
+                    </div>
+                    <div class="credential-item">
+                        <strong>Staff:</strong> staff1 / staff123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect based on user login status
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('hospitalityUser');
+            if (savedUser) {
+                // If user is logged in, show dashboard link prominently
+                document.querySelector('a[href="dashboard.html"]').classList.add('btn-highlight');
+            }
+        });
+    </script>
+</body>
+</html>

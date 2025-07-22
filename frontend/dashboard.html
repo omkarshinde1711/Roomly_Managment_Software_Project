@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Hospitality Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Main Dashboard -->
+    <div class="dashboard-wrapper">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="nav-icon">🏨</span>
+                <span class="nav-title">HMS Dashboard</span>
+            </div>
+            <div class="nav-user">
+                <span id="currentUser" class="user-welcome">Welcome, User</span>
+                <button id="logoutBtn" class="btn btn-secondary btn-logout">
+                    <span class="btn-icon">🚪</span>
+                    <span class="btn-text">Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="reservations">
+                        <span class="tab-icon">📋</span>
+                        <span class="tab-text">Reservations</span>
+                    </button>
+                    <button class="tab-btn" data-tab="availability">
+                        <span class="tab-icon">🔍</span>
+                        <span class="tab-text">Check Availability</span>
+                    </button>
+                    <button class="tab-btn" data-tab="newReservation">
+                        <span class="tab-icon">➕</span>
+                        <span class="tab-text">New Reservation</span>
+                    </button>
+                    <button class="tab-btn" data-tab="management" id="managementTab" style="display: none;">
+                        <span class="tab-icon">🏢</span>
+                        <span class="tab-text">Management</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reservations Tab -->
+            <div id="reservations" class="tab-content active">
+                <div class="content-header">
+                    <h2 class="page-title">📋 Current Reservations</h2>
+                    <div class="header-actions">
+                        <div class="filters">
+                            <select id="statusFilter" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="CheckedIn">Checked In</option>
+                                <option value="CheckedOut">Checked Out</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <button id="refreshReservations" class="btn btn-secondary">
+                                <span class="btn-icon">🔄</span>
+                                <span class="btn-text">Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="reservationsList" class="reservations-table-wrapper"></div>
+                </div>
+            </div>
+
+            <!-- Availability Check Tab -->
+            <div id="availability" class="tab-content">
+                <div class="content-header">
+                    <h2 class="page-title">🔍 Check Room Availability</h2>
+                </div>
+                <div class="form-card">
+                    <div class="availability-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="availHotel" class="form-label">Hotel:</label>
+                                <select id="availHotel" class="form-input" required>
+                                    <option value="">Select Hotel</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="availRoom" class="form-label">Room:</label>
+                                <select id="availRoom" class="form-input" required>
+                                    <option value="">Select Room</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="availCheckIn" class="form-label">Check-in Date:</label>
+                                <input type="date" id="availCheckIn" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="availCheckOut" class="form-label">Check-out Date:</label>
+                                <input type="date" id="availCheckOut" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="checkAvailabilityBtn" class="btn btn-primary btn-large">
+                                <span class="btn-icon">🔍</span>
+                                <span class="btn-text">Check Availability</span>
+                            </button>
+                        </div>
+                        
+                        <div id="availabilityResult" class="availability-result"></div>
+                        <div id="alternativeRooms" class="alternative-rooms"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Reservation Tab -->
+            <div id="newReservation" class="tab-content">
+                <div class="content-header">
+                    <h2 class="page-title">➕ Create New Reservation</h2>
+                </div>
+                <div class="form-card">
+                    <form id="reservationForm" class="reservation-form">
+                        <div class="form-section">
+                            <h3 class="form-section-title">Room Selection</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="resHotel" class="form-label">Hotel:</label>
+                                    <select id="resHotel" class="form-input" required>
+                                        <option value="">Select Hotel</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resRoom" class="form-label">Room:</label>
+                                    <select id="resRoom" class="form-input" required>
+                                        <option value="">Select Room</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3 class="form-section-title">Dates</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="resCheckIn" class="form-label">Check-in Date:</label>
+                                    <input type="date" id="resCheckIn" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resCheckOut" class="form-label">Check-out Date:</label>
+                                    <input type="date" id="resCheckOut" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3 class="form-section-title">Guest Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="guestName" class="form-label">Guest Name:</label>
+                                    <input type="text" id="guestName" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="guestPhone" class="form-label">Guest Phone:</label>
+                                    <input type="tel" id="guestPhone" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="guestEmail" class="form-label">Guest Email:</label>
+                                <input type="email" id="guestEmail" class="form-input" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-large">
+                                <span class="btn-icon">✓</span>
+                                <span class="btn-text">Create Reservation</span>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="reservationMessage" class="message"></div>
+                </div>
+            </div>
+
+            <!-- Management Tab (Admin Only) -->
+            <div id="management" class="tab-content">
+                <div class="content-header">
+                    <h2 class="page-title">🏢 Hotel & Room Management</h2>
+                </div>
+                
+                <div class="management-grid">
+                    <div class="form-card">
+                        <div class="management-section">
+                            <h3 class="form-section-title">Add New Hotel</h3>
+                            <form id="hotelForm" class="management-form">
+                                <div class="form-group">
+                                    <label for="hotelName" class="form-label">Hotel Name:</label>
+                                    <input type="text" id="hotelName" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hotelAddress" class="form-label">Address:</label>
+                                    <input type="text" id="hotelAddress" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hotelPhone" class="form-label">Phone:</label>
+                                    <input type="tel" id="hotelPhone" class="form-input" required>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="btn-icon">🏨</span>
+                                        <span class="btn-text">Add Hotel</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="form-card">
+                        <div class="management-section">
+                            <h3 class="form-section-title">Add New Room</h3>
+                            <form id="roomForm" class="management-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="roomHotel" class="form-label">Hotel:</label>
+                                        <select id="roomHotel" class="form-input" required>
+                                            <option value="">Select Hotel</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="roomNumber" class="form-label">Room Number:</label>
+                                        <input type="text" id="roomNumber" class="form-input" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="roomType" class="form-label">Room Type:</label>
+                                        <select id="roomType" class="form-input" required>
+                                            <option value="">Select Type</option>
+                                            <option value="Single">Single</option>
+                                            <option value="Double">Double</option>
+                                            <option value="Suite">Suite</option>
+                                            <option value="Deluxe">Deluxe</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="roomRate" class="form-label">Rate per Night ($):</label>
+                                        <input type="number" id="roomRate" class="form-input" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="roomOccupancy" class="form-label">Max Occupancy:</label>
+                                    <input type="number" id="roomOccupancy" class="form-input" min="1" max="10" value="2" required>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="btn-icon">🛏️</span>
+                                        <span class="btn-text">Add Room</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="managementMessage" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

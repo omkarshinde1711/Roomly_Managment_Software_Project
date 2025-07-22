@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Hospitality Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+    <!-- Login Screen -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">🏨 Hospitality Management System</h1>
+                <p class="login-subtitle">Modern Hotel Management Solution</p>
+            </div>
+            <div class="login-form">
+                <h2>Staff Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username:</label>
+                        <input type="text" id="username" name="username" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" id="password" name="password" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login">
+                        <span class="btn-icon">🔐</span>
+                        <span class="btn-text">Login</span>
+                    </button>
+                </form>
+                <div id="loginMessage" class="message"></div>
+                <div class="demo-credentials">
+                    <h3>Demo Credentials:</h3>
+                    <div class="credentials-grid">
+                        <div class="credential-item">
+                            <strong>Admin:</strong> admin / admin123
+                        </div>
+                        <div class="credential-item">
+                            <strong>Staff:</strong> staff1 / staff123
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

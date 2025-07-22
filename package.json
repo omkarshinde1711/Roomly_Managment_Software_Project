@@ -1,0 +1,29 @@
+{
+  "name": "hospitality-management-system",
+  "version": "1.0.0",
+  "description": "A comprehensive hospitality management system with real-time room availability checking",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "test-db": "node test-db.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hospitality",
+    "hotel",
+    "reservation",
+    "management",
+    "sql",
+    "node.js"
+  ],
+  "author": "Omkar Shinde",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mysql2": "^3.14.2"
+  }
+}
