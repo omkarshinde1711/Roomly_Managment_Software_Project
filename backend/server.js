@@ -264,6 +264,50 @@ app.post('/api/rooms', async (req, res) => {
     }
 });
 
+// Get rooms by hotel ID
+app.get('/api/hotels/:hotelId/rooms', async (req, res) => {
+    try {
+        const { hotelId } = req.params;
+        
+        const [rows] = await pool.execute(
+            'SELECT RoomID, RoomNumber, RoomType, RatePerNight, MaxOccupancy FROM Rooms WHERE HotelID = ? ORDER BY RoomNumber', 
+            [hotelId]
+        );
+        
+        res.json({
+            success: true,
+            rooms: rows
+        });
+    } catch (err) {
+        console.error('Get rooms by hotel error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
+// Check room availability - Alternative endpoint path
+app.post('/api/rooms/availability', async (req, res) => {
+    try {
+        const { roomId, checkInDate, checkOutDate } = req.body;
+        
+        const [rows] = await pool.execute('CALL sp_CheckRoomAvailability(?, ?, ?)', 
+            [roomId, checkInDate, checkOutDate]);
+        
+        res.json({
+            success: true,
+            availability: rows[0][0]
+        });
+    } catch (err) {
+        console.error('Check room availability error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
 // Serve the main HTML file for all non-API routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
