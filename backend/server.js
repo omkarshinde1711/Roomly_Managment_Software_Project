@@ -142,10 +142,23 @@ app.post('/api/available-rooms', async (req, res) => {
 // 5. Create Reservation
 app.post('/api/reservations', async (req, res) => {
     try {
+        console.log('Create reservation request body:', req.body); // Debug log
+        
         const { userId, roomId, guestName, guestPhone, guestEmail, checkInDate, checkOutDate } = req.body;
         
+        console.log('Extracted values:', { userId, roomId, guestName, guestPhone, guestEmail, checkInDate, checkOutDate }); // Debug log
+        
+        // Validate required fields
+        if (!userId || !roomId || !guestName || !checkInDate || !checkOutDate) {
+            console.log('Validation failed - missing fields:', { userId: !!userId, roomId: !!roomId, guestName: !!guestName, checkInDate: !!checkInDate, checkOutDate: !!checkOutDate });
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: userId, roomId, guestName, checkInDate, checkOutDate'
+            });
+        }
+        
         const [rows] = await pool.execute('CALL sp_CreateReservation(?, ?, ?, ?, ?, ?, ?)', 
-            [userId, roomId, guestName, guestPhone, guestEmail, checkInDate, checkOutDate]);
+            [userId, roomId, guestName, guestPhone || null, guestEmail || null, checkInDate, checkOutDate]);
         
         res.json({
             success: true,
@@ -301,6 +314,46 @@ app.post('/api/rooms/availability', async (req, res) => {
         });
     } catch (err) {
         console.error('Check room availability error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
+// 10. Cancel Reservation
+app.delete('/api/reservations/:id', async (req, res) => {
+    try {
+        const reservationId = req.params.id;
+        
+        await pool.execute('CALL sp_CancelReservation(?)', [reservationId]);
+        
+        res.json({
+            success: true,
+            message: 'Reservation cancelled successfully'
+        });
+    } catch (err) {
+        console.error('Cancel reservation error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
+// 11. Generate Bill (separate endpoint)
+app.get('/api/bills/:reservationId', async (req, res) => {
+    try {
+        const reservationId = req.params.reservationId;
+        
+        const [rows] = await pool.execute('CALL sp_GenerateBill(?)', [reservationId]);
+        
+        res.json({
+            success: true,
+            bill: rows[0][0]
+        });
+    } catch (err) {
+        console.error('Generate bill error:', err);
         res.status(500).json({
             success: false,
             message: 'Server error'

@@ -102,9 +102,9 @@ function isDemoCredentials(username, password) {
 
 function handleDemoLogin(username) {
     const demoUser = {
-        userID: username === 'admin' ? 1 : 2,
-        username: username,
-        role: username === 'admin' ? 'Admin' : 'Staff',
+        UserID: username === 'admin' ? 1 : 2,
+        Username: username,
+        Role: username === 'admin' ? 'Admin' : 'Staff',
         name: username === 'admin' ? 'Admin User' : 'Staff User'
     };
     

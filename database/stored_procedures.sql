@@ -242,4 +242,17 @@ BEGIN
     ORDER BY h.Name, r.RoomNumber;
 END //
 
+-- 11. Cancel Reservation
+CREATE PROCEDURE sp_CancelReservation(
+    IN p_ReservationID INT
+)
+BEGIN
+    UPDATE Reservations 
+    SET Status = 'Cancelled'
+    WHERE ReservationID = p_ReservationID
+    AND Status NOT IN ('CheckedOut', 'Cancelled');
+    
+    SELECT ROW_COUNT() AS AffectedRows;
+END //
+
 DELIMITER ;

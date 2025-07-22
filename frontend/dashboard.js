@@ -39,7 +39,7 @@ function checkAuthentication() {
         updateUserDisplay();
         
         // Show management tab for admin users
-        if (currentUser.role === 'Admin') {
+        if (currentUser.Role === 'Admin') {
             const managementTab = document.getElementById('managementTab');
             if (managementTab) {
                 managementTab.style.display = 'block';
@@ -56,7 +56,7 @@ function updateUserDisplay() {
         console.log('Current user object:', currentUser); // Debug log
         
         // Use the normalized property names
-        const displayName = currentUser.name || currentUser.username || 'User';
+        const displayName = currentUser.name || currentUser.Username || 'User';
         
         currentUserSpan.textContent = `Welcome, ${displayName}`;
     } else {
@@ -485,6 +485,8 @@ function getReservationActions(reservation) {
         actions.push(`<button class="btn btn-danger btn-sm" onclick="cancelReservation(${reservation.ReservationID})">Cancel</button>`);
     } else if (reservation.Status === 'CheckedIn') {
         actions.push(`<button class="btn btn-warning btn-sm" onclick="checkOutReservation(${reservation.ReservationID})">Check Out</button>`);
+    } else if (reservation.Status === 'CheckedOut') {
+        actions.push(`<button class="btn btn-info btn-sm" onclick="viewBill(${reservation.ReservationID})">View Bill</button>`);
     }
     
     return actions.join('');
@@ -493,8 +495,15 @@ function getReservationActions(reservation) {
 async function handleCreateReservation(e) {
     e.preventDefault();
     
+    // Get current user info
+    const currentUser = JSON.parse(localStorage.getItem('hms_user') || '{}');
+    if (!currentUser.UserID) {
+        showReservationMessage('User authentication error. Please login again.', 'error');
+        return;
+    }
+    
     const formData = {
-        hotelId: document.getElementById('resHotel').value,
+        userId: currentUser.UserID,
         roomId: document.getElementById('resRoom').value,
         checkInDate: document.getElementById('resCheckIn').value,
         checkOutDate: document.getElementById('resCheckOut').value,
@@ -533,6 +542,22 @@ async function handleCreateReservation(e) {
 }
 
 function validateReservationForm(data) {
+    if (!data.userId) {
+        showReservationMessage('User authentication error', 'error');
+        return false;
+    }
+    if (!data.roomId) {
+        showReservationMessage('Please select a room', 'error');
+        return false;
+    }
+    if (!data.guestName) {
+        showReservationMessage('Guest name is required', 'error');
+        return false;
+    }
+    if (!data.checkInDate || !data.checkOutDate) {
+        showReservationMessage('Check-in and check-out dates are required', 'error');
+        return false;
+    }
     if (new Date(data.checkInDate) >= new Date(data.checkOutDate)) {
         showReservationMessage('Check-out date must be after check-in date', 'error');
         return false;
@@ -592,20 +617,127 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// Placeholder functions for reservation actions
+// Reservation action functions
 async function checkInReservation(id) {
-    console.log('Check in reservation:', id);
-    // Implement check-in logic
+    try {
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`/api/checkin/${id}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Guest checked in successfully!');
+            loadReservations(); // Refresh the reservations list
+        } else {
+            alert('Error checking in: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Check in error:', error);
+        alert('Error checking in guest. Please try again.');
+    }
 }
 
 async function checkOutReservation(id) {
-    console.log('Check out reservation:', id);
-    // Implement check-out logic
+    try {
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`/api/checkout/${id}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            let message = 'Guest checked out successfully!';
+            if (data.bill && data.bill.TotalAmount) {
+                message += `\n\nBill Generated:\nTotal Amount: $${data.bill.TotalAmount}\nBill ID: ${data.bill.BillID}`;
+            }
+            alert(message);
+            loadReservations(); // Refresh the reservations list
+        } else {
+            alert('Error checking out: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Check out error:', error);
+        alert('Error checking out guest. Please try again.');
+    }
 }
 
 async function cancelReservation(id) {
-    console.log('Cancel reservation:', id);
-    // Implement cancellation logic
+    if (!confirm('Are you sure you want to cancel this reservation?')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`/api/reservations/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Reservation cancelled successfully!');
+            loadReservations(); // Refresh the reservations list
+        } else {
+            alert('Error cancelling reservation: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Cancel reservation error:', error);
+        alert('Error cancelling reservation. Please try again.');
+    }
+}
+
+async function viewBill(reservationId) {
+    try {
+        const token = localStorage.getItem('token');
+        
+        const response = await fetch(`/api/bills/${reservationId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.bill) {
+            const bill = data.bill;
+            const billDetails = `
+Bill Details
+============
+Bill ID: ${bill.BillID}
+Reservation ID: ${bill.ReservationID}
+Total Amount: $${bill.TotalAmount}
+Payment Status: ${bill.PaymentStatus}
+Created Date: ${new Date(bill.CreatedDate).toLocaleDateString()}
+            `.trim();
+            
+            alert(billDetails);
+        } else {
+            alert('Error retrieving bill: ' + (data.message || 'Bill not found'));
+        }
+    } catch (error) {
+        console.error('View bill error:', error);
+        alert('Error retrieving bill. Please try again.');
+    }
 }
 
 async function handleCreateHotel(e) {
