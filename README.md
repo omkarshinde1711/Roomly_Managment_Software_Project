@@ -8,6 +8,8 @@ SQL-focused hotel management system demonstrating comprehensive database design,
 
 ## Video Demonstration
 
+<img width="1827" height="1039" alt="Roomly Dashboard" src="https://github.com/user-attachments/assets/83fcee28-2c95-4cd6-aad8-747c6804f54d" />
+
 [![Roomly Management System Demo](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](URL_TO_YOUR_VIDEO)
 
 ## Technology Stack
