@@ -1,7 +1,7 @@
 {
-  "name": "hospitality-management-system",
+  "name": "roomly-management-software-project",
   "version": "1.0.0",
-  "description": "A comprehensive hospitality management system with real-time room availability checking",
+  "description": "SQL-focused hotel management system with comprehensive stored procedures and real-time availability checking",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",

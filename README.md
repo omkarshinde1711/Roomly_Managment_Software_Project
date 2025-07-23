@@ -1,230 +1,149 @@
-# 🏨 Hospitality Management System
+# Roomly Management Software Project
 
-A comprehensive hotel reservation and management system with real-time room availability checking.
+SQL-focused hotel management system demonstrating comprehensive database design, stored procedures, and real-time availability checking.
 
-## 📋 Project Overview
+## Video Demonstration
 
-This system provides a complete solution for managing hotel reservations with a focus on real-time room availability checking. It includes user authentication, hotel and room registration, reservation lifecycle management, and automatic bill generation.
+[![Roomly Management System Demo](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](URL_TO_YOUR_VIDEO)
 
-## ✨ Key Features
+## Technology Stack
 
-### Core Features
-- **Real-time Room Availability Checking** - Instantly verify if rooms are available for specific dates
-- **User Authentication** - Secure login system for hotel staff and administrators
-- **Reservation Management** - Complete booking lifecycle (create, check-in, check-out, cancel)
-- **Alternative Room Suggestions** - Automatically suggest available alternatives when selected room is unavailable
-- **Bill Generation** - Automatic calculation and generation of guest bills
+**Database**: MySQL with comprehensive stored procedures  
+**Backend**: Node.js with Express API  
+**Frontend**: HTML5, CSS3, JavaScript  
+**Architecture**: Full-stack web application with SQL-first approach
 
-### User Interface
-- **Modern Web Interface** - Clean, responsive design for easy navigation
-- **Dashboard View** - Comprehensive overview of all reservations and hotel operations
-- **Role-based Access** - Different permissions for Admin and Staff users
-- **Real-time Feedback** - Instant availability status with visual indicators
+## Database Implementation
 
-## 🏗️ System Architecture
-
-### Backend Components
-- **Database**: SQL Server with relational schema
-- **API Server**: Node.js with Express framework
-- **Stored Procedures**: All business logic implemented in SQL
-
-### Frontend Components
-- **Web Application**: HTML5, CSS3, JavaScript (ES6+)
-- **Responsive Design**: Works on desktop and mobile devices
-- **Real-time Updates**: Dynamic content loading without page refresh
-
-## 📊 Database Schema
-
-### Tables
-- **Users**: System user authentication and roles
-- **Hotels**: Hotel property information
-- **Rooms**: Room details and pricing
-- **Reservations**: Guest booking records
-- **Bills**: Billing and payment information
+### Core Tables
+```sql
+Users           - Authentication and role management
+Hotels          - Property information
+Rooms           - Room inventory with rates
+Reservations    - Booking lifecycle management
+Bills           - Automated billing system
+```
 
 ### Key Stored Procedures
-- `sp_CheckRoomAvailability` - Core availability checking logic
-- `sp_GetAvailableRooms` - Find alternative room options
-- `sp_CreateReservation` - Create new bookings
-- `sp_CheckIn` / `sp_CheckOut` - Guest management
-- `sp_GenerateBill` - Automatic bill calculation
+```sql
+sp_CheckRoomAvailability    - Real-time availability checking
+sp_GetAvailableRooms       - Alternative room suggestions
+sp_CreateReservation       - Reservation creation with validation
+sp_CheckIn / sp_CheckOut   - Guest management workflow
+sp_GenerateBill            - Automated bill calculation
+sp_UserLogin               - Secure authentication
+```
 
-## 🚀 Getting Started
+## Core Features
+
+**Real-time Room Availability**: SQL-based conflict detection with date overlap logic  
+**Complete Reservation Lifecycle**: Create → Check-in → Check-out → Bill Generation  
+**Alternative Room Suggestions**: Smart recommendations when rooms unavailable  
+**User Authentication**: Role-based access (Admin/Staff) with session management  
+**Automated Billing**: Dynamic calculation based on stay duration and room rates
+
+## SQL Highlights
+
+### Availability Checking Logic
+```sql
+-- Core business logic for room availability
+SELECT COUNT(*) INTO v_ConflictCount
+FROM Reservations
+WHERE RoomID = p_RoomID
+AND Status IN ('Confirmed', 'CheckedIn')
+AND (p_CheckInDate < CheckOutDate AND p_CheckOutDate > CheckInDate);
+```
+
+### Bill Generation
+```sql
+-- Automated billing calculation
+SET v_TotalAmount = v_RatePerNight * v_NumberOfNights;
+INSERT INTO Bills (ReservationID, TotalAmount, PaymentStatus)
+VALUES (p_ReservationID, v_TotalAmount, 'Unpaid');
+```
+
+## Project Structure
+
+```
+database/
+├── schema.sql              # Complete database schema
+└── stored_procedures.sql   # 11 comprehensive stored procedures
+
+backend/
+├── server.js              # Express API with 12 endpoints
+└── database.js           # MySQL connection management
+
+frontend/
+├── index.html            # Landing page with authentication
+├── dashboard.html        # Main application interface
+├── styles.css           # Professional styling
+└── dashboard.js         # API integration and UI logic
+```
+
+## Installation & Setup
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- SQL Server (LocalDB, Express, or full version)
-- Modern web browser
+- Node.js (v14+)
+- MySQL Server
+- MySQL Workbench (recommended)
 
-### Installation
-
-1. **Clone or download the project**
-   ```cmd
-   cd d:\COLLEGE\SQL\OmkarShinde_SQL_Project
-   ```
-
-2. **Install dependencies**
-   ```cmd
-   npm install
-   ```
-
-3. **Set up the database**
-   - Create a new database called `HospitalityDB`
-   - Run the scripts in this order:
-     ```sql
-     -- 1. Create tables
-     database/schema.sql
-     
-     -- 2. Create stored procedures
-     database/stored_procedures.sql
-     ```
-
-4. **Configure database connection**
-   - Edit `backend/database.js`
-   - Update the connection settings:
-     ```javascript
-     const config = {
-         user: 'your_username',
-         password: 'your_password',
-         server: 'localhost',
-         database: 'HospitalityDB'
-     };
-     ```
-
-5. **Start the application**
-   ```cmd
-   npm start
-   ```
-
-6. **Access the application**
-   - Open your browser and go to: `http://localhost:3000`
-
-### Demo Login Credentials
-- **Administrator**: `admin` / `admin123`
-- **Staff Member**: `staff1` / `staff123`
-
-## 💻 Usage Guide
-
-### For Hotel Staff
-
-1. **Login** - Use your credentials to access the system
-2. **Check Availability** - Enter dates and room details to check availability
-3. **Create Reservations** - Book rooms for guests with complete details
-4. **Manage Check-ins/Check-outs** - Process guest arrivals and departures
-5. **View Dashboard** - Monitor all current and upcoming reservations
-
-### For Administrators
-
-All staff features plus:
-- **Add Hotels** - Register new hotel properties
-- **Add Rooms** - Create room inventory with pricing
-- **Full System Access** - Complete management capabilities
-
-### Key Workflows
-
-#### Room Availability Check
-1. Select hotel and room
-2. Choose check-in and check-out dates
-3. Click "Check Availability"
-4. System displays availability status instantly
-5. If unavailable, view alternative room suggestions
-
-#### Creating a Reservation
-1. Select hotel and available room
-2. Enter guest information
-3. Specify dates
-4. System verifies availability before booking
-5. Confirmation with reservation ID
-
-#### Check-in/Check-out Process
-1. Find reservation in dashboard
-2. Click "Check In" when guest arrives
-3. Click "Check Out" when guest departs
-4. System automatically generates final bill
-
-## 🔧 Technical Details
-
-### API Endpoints
-- `POST /api/login` - User authentication
-- `GET /api/hotels` - Retrieve hotels and rooms
-- `POST /api/check-availability` - Check room availability
-- `POST /api/available-rooms` - Get alternative options
-- `POST /api/reservations` - Create new reservation
-- `GET /api/reservations` - View all reservations
-- `POST /api/checkin/:id` - Check in guest
-- `POST /api/checkout/:id` - Check out guest and generate bill
-
-### Database Features
-- **Foreign Key Constraints** - Ensures data integrity
-- **Date Validation** - Prevents invalid booking dates
-- **Unique Constraints** - No duplicate room numbers per hotel
-- **Automated Calculations** - Bill totals computed automatically
-
-### Security Features
-- **Password Hashing** - SHA2_256 encryption for user passwords
-- **Parameterized Queries** - Protection against SQL injection
-- **Role-based Access** - Different permissions for Admin vs Staff
-- **Input Validation** - Client and server-side validation
-
-## 🧪 Testing Scenarios
-
-### Core Functionality Tests
-1. **Double Booking Prevention** - Try to book the same room for overlapping dates
-2. **Availability Accuracy** - Verify dates show correct availability status
-3. **Bill Calculation** - Confirm nightly rate × number of nights = total
-4. **Alternative Suggestions** - Check that alternatives exclude unavailable rooms
-5. **Status Updates** - Verify reservation status changes correctly
-
-### User Interface Tests
-1. **Responsive Design** - Test on different screen sizes
-2. **Form Validation** - Ensure required fields are validated
-3. **Date Logic** - Check-out date must be after check-in date
-4. **Real-time Updates** - Verify instant availability feedback
-
-## 📁 Project Structure
-
-```
-OmkarShinde_SQL_Project/
-├── backend/
-│   ├── server.js          # Express API server
-│   └── database.js        # Database connection configuration
-├── database/
-│   ├── schema.sql         # Database tables and sample data
-│   └── stored_procedures.sql # All business logic procedures
-├── frontend/
-│   ├── index.html         # Main application interface
-│   ├── styles.css         # Modern styling and responsive design
-│   └── script.js          # Frontend logic and API integration
-├── .github/
-│   └── copilot-instructions.md # Development guidelines
-├── package.json           # Node.js dependencies and scripts
-└── README.md             # This documentation file
+### Database Setup
+```sql
+CREATE DATABASE HospitalityDB;
+USE HospitalityDB;
+-- Run database/schema.sql
+-- Run database/stored_procedures.sql
 ```
 
-## 🎯 Project Goals Achieved
+### Application Start
+```bash
+npm install
+npm start
+# Access at http://localhost:3000
+```
 
-✅ **Real-time Availability Checking** - Core feature implemented with instant feedback  
-✅ **User Authentication** - Secure login system with role-based access  
-✅ **Complete Reservation Lifecycle** - From booking to check-out with bill generation  
-✅ **Alternative Room Suggestions** - Smart recommendations when rooms unavailable  
-✅ **Modern User Interface** - Clean, intuitive design for hotel staff  
-✅ **Robust Database Design** - Proper relationships and business logic  
-✅ **Professional Code Quality** - Well-structured, documented, and maintainable  
+### Demo Credentials
+```
+Admin: admin / admin123
+Staff: staff1 / staff123
+```
 
-## 🔮 Future Enhancements
+## API Endpoints
 
-- Payment processing integration
-- Email notifications for reservations
-- Advanced reporting and analytics
-- Mobile app development
-- Integration with hotel booking platforms
-- Multi-language support
+```
+POST /api/login                    - User authentication
+GET  /api/hotels                   - Retrieve hotels with rooms
+POST /api/check-availability       - Real-time availability check
+POST /api/reservations             - Create new reservation
+GET  /api/reservations             - Get all reservations
+POST /api/checkin/:id              - Guest check-in
+POST /api/checkout/:id             - Check-out with billing
+DELETE /api/reservations/:id       - Cancel reservation
+GET  /api/bills/:reservationId     - Retrieve bill details
+```
 
-## 👨‍💻 Developer Information
+## Key SQL Features Implemented
 
-**Project**: Hospitality Management System  
-**Developer**: Omkar Shinde  
-**Technology Stack**: Node.js, Express, SQL Server, HTML5, CSS3, JavaScript  
-**Key Focus**: Real-time room availability checking and reservation management  
+**Parameterized Queries**: Protection against SQL injection  
+**Foreign Key Constraints**: Data integrity enforcement  
+**Date Validation**: Business rule implementation  
+**Automated Calculations**: Server-side business logic  
+**Transaction Management**: Consistent data operations  
+**Stored Procedure Architecture**: All business logic in database layer
 
-This project demonstrates proficiency in full-stack development, database design, and creating practical business solutions for the hospitality industry.
+## Testing Scenarios
+
+**Double Booking Prevention**: Overlapping date conflict detection  
+**Availability Accuracy**: Real-time status verification  
+**Bill Calculation**: Rate × nights validation  
+**Alternative Suggestions**: Available room recommendations  
+**Status Workflow**: Reservation lifecycle management
+
+## Developer Information
+
+**Project**: SQL-focused Hotel Management System  
+**Author**: Omkar Shinde  
+**Focus**: Database design, stored procedures, and business logic implementation  
+**Completion**: 95% - Production ready
+
+This project demonstrates advanced SQL database design, comprehensive stored procedure implementation, and real-world business logic handling in a hotel management context.
