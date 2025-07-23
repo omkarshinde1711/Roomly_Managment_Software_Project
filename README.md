@@ -1,5 +1,9 @@
 # Roomly Management Software Project
 
+<div align="center">
+  <img src="frontend/assets/logo.png" alt="Roomly Logo" width="100"/>
+</div>
+
 SQL-focused hotel management system demonstrating comprehensive database design, stored procedures, and real-time availability checking.
 
 ## Video Demonstration
