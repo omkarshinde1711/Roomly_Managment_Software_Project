@@ -11,6 +11,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Keep .env.example for documentation
+!.env.example
+
 # Database configuration and setup files
 DATABASE_SETUP.md
 test-db.js

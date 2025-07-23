@@ -1,11 +1,14 @@
 // Database configuration for MySQL
 const mysql = require('mysql2/promise');
 
+// Database configuration for MySQL
+const mysql = require('mysql2/promise');
+
 const config = {
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: '1711',
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'your_password_here',
     // database: 'HospitalityDB', // Comment out for initial setup
     waitForConnections: true,
     connectionLimit: 10,
