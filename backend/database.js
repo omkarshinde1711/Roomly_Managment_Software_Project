@@ -1,7 +1,5 @@
 // Database configuration for MySQL
-const mysql = require('mysql2/promise');
-
-// Database configuration for MySQL
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 const config = {
