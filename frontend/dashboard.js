@@ -281,7 +281,7 @@ function populateRoomSelect(select, rooms) {
     rooms.forEach(room => {
         const option = document.createElement('option');
         option.value = room.RoomID;
-        option.textContent = `${room.RoomNumber} - ${room.RoomType} ($${room.RatePerNight}/night)`;
+        option.textContent = `${room.RoomNumber} - ${room.RoomType} (₹${room.RatePerNight}/night)`;
         // Explicitly set styles to ensure visibility
         option.style.color = '#495057';
         option.style.backgroundColor = 'white';
@@ -332,8 +332,15 @@ async function checkRoomAvailability() {
                 data.available
             );
             
-            if (!data.available && data.alternatives) {
-                showAlternativeRooms(data.alternatives);
+            // If room is not available, fetch alternative rooms
+            if (!data.available) {
+                await fetchAlternativeRooms(hotelId, checkIn, checkOut);
+            } else {
+                // Clear any previous alternatives if room is available
+                const alternativesDiv = document.getElementById('alternativeRooms');
+                if (alternativesDiv) {
+                    alternativesDiv.innerHTML = '';
+                }
             }
         } else {
             console.error('Availability check failed:', data);
@@ -356,30 +363,109 @@ function showAvailabilityResult(message, isAvailable) {
     }
 }
 
-function showAlternativeRooms(alternatives) {
+async function fetchAlternativeRooms(hotelId, checkInDate, checkOutDate) {
+    try {
+        console.log('Fetching alternatives for:', { hotelId, checkInDate, checkOutDate });
+        
+        const response = await fetch(`${API_BASE}/rooms/available`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                hotelId,
+                checkInDate,
+                checkOutDate,
+                roomType: null // Get all room types
+            })
+        });
+        
+        console.log('Alternative rooms response status:', response.status);
+        console.log('Alternative rooms response headers:', response.headers.get('content-type'));
+        
+        // Get response text first to debug
+        const responseText = await response.text();
+        console.log('Raw response text:', responseText);
+        
+        if (!response.ok) {
+            console.error('Response not OK:', response.status, response.statusText);
+            console.error('Error response body:', responseText);
+            showNoAlternatives();
+            return;
+        }
+        
+        // Try to parse as JSON
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            console.error('Response was not valid JSON:', responseText);
+            showNoAlternatives();
+            return;
+        }
+        
+        console.log('Alternative rooms response:', data);
+        
+        if (data.success && data.rooms && data.rooms.length > 0) {
+            showAlternativeRooms(data.rooms);
+        } else {
+            showNoAlternatives();
+        }
+    } catch (error) {
+        console.error('Error fetching alternative rooms:', error);
+        showNoAlternatives();
+    }
+}
+
+function showAlternativeRooms(rooms) {
     const alternativeDiv = document.getElementById('alternativeRooms');
-    if (!alternativeDiv || !alternatives.length) return;
+    if (!alternativeDiv) return;
     
-    let html = '<h3>Alternative Available Rooms</h3><div class="room-grid">';
+    let html = '<div class="alternatives-section">';
+    html += '<h3>Alternative Available Rooms</h3>';
+    html += '<div class="room-grid">';
     
-    alternatives.forEach(room => {
+    rooms.forEach(room => {
         html += `
-            <div class="room-card" onclick="selectAlternativeRoom(${room.RoomID})">
-                <div class="room-number">${room.RoomNumber}</div>
-                <div class="room-type">${room.RoomType}</div>
-                <div class="room-rate">$${room.RatePerNight}/night</div>
+            <div class="room-card" onclick="selectAlternativeRoom(${room.RoomID}, '${room.RoomNumber}')">
+                <div class="room-header">
+                    <div class="room-number">Room ${room.RoomNumber}</div>
+                    <div class="room-type">${room.RoomType}</div>
+                </div>
+                <div class="room-details">
+                    <div class="room-rate">₹${Number(room.RatePerNight).toFixed(2)}/night</div>
+                    <div class="room-capacity">Max: ${room.MaxOccupancy} guests</div>
+                    <div class="hotel-name">${room.HotelName}</div>
+                </div>
+                <button class="btn btn-sm btn-primary">Select This Room</button>
             </div>
         `;
     });
     
-    html += '</div>';
+    html += '</div></div>';
     alternativeDiv.innerHTML = html;
     alternativeDiv.style.display = 'block';
 }
 
-function selectAlternativeRoom(roomId) {
+function showNoAlternatives() {
+    const alternativeDiv = document.getElementById('alternativeRooms');
+    if (alternativeDiv) {
+        alternativeDiv.innerHTML = '<div class="no-alternatives">No alternative rooms available for these dates.</div>';
+        alternativeDiv.style.display = 'block';
+    }
+}
+
+function selectAlternativeRoom(roomId, roomNumber) {
+    // Update the room selection
     document.getElementById('availRoom').value = roomId;
-    checkRoomAvailability();
+    
+    // Show confirmation message
+    showAvailabilityResult(`Selected alternative room: ${roomNumber} - This room is available!`, true);
+    
+    // Hide alternatives
+    const alternativeDiv = document.getElementById('alternativeRooms');
+    if (alternativeDiv) {
+        alternativeDiv.style.display = 'none';
+    }
 }
 
 async function loadReservations() {
@@ -435,32 +521,66 @@ function displayReservations(reservations) {
 }
 
 function createReservationCard(reservation) {
+    const statusClass = reservation.Status.toLowerCase();
+    
     return `
-        <div class="reservation-card">
-            <div class="reservation-header">
-                <div class="guest-name">${reservation.GuestName}</div>
-                <span class="status-badge status-${reservation.Status.toLowerCase()}">${reservation.Status}</span>
+        <div class="reservation-card-modern">
+            <div class="reservation-card-header">
+                <div class="guest-info">
+                    <h3 class="guest-name">${reservation.GuestName}</h3>
+                    <p class="guest-phone">${reservation.GuestPhone}</p>
+                </div>
+                <span class="status-badge-modern status-${statusClass}">${reservation.Status}</span>
             </div>
-            <div class="reservation-details">
-                <div class="detail-item">
-                    <span class="detail-label">Room:</span> ${reservation.RoomNumber}
+            
+            <div class="hotel-location">
+                <span class="hotel-name">${reservation.HotelName || 'N/A'}</span>
+            </div>
+            
+            <div class="reservation-details-grid">
+                <div class="detail-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Room</span>
+                        <span class="detail-value">${reservation.RoomNumber}</span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Check-in:</span> ${formatDate(reservation.CheckInDate)}
+                
+                <div class="detail-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Check-in</span>
+                        <span class="detail-value">${formatDate(reservation.CheckInDate)}</span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Check-out:</span> ${formatDate(reservation.CheckOutDate)}
+                
+                <div class="detail-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Check-out</span>
+                        <span class="detail-value">${formatDate(reservation.CheckOutDate)}</span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Rate:</span> $${reservation.RatePerNight ? Number(reservation.RatePerNight).toFixed(2) : 'N/A'}/night
+                
+                <div class="detail-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Rate</span>
+                        <span class="detail-value">₹${reservation.RatePerNight ? Number(reservation.RatePerNight).toFixed(2) : 'N/A'}/night</span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Nights:</span> ${reservation.NumberOfNights || 'N/A'}
+                
+                <div class="detail-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Nights</span>
+                        <span class="detail-value">${reservation.NumberOfNights || 'N/A'}</span>
+                    </div>
                 </div>
-                <div class="detail-item">
-                    <span class="detail-label">Total:</span> $${reservation.TotalAmount ? Number(reservation.TotalAmount).toFixed(2) : 'Calculating...'}
+                
+                <div class="detail-card total-card">
+                    <div class="detail-content">
+                        <span class="detail-label">Total</span>
+                        <span class="detail-value total-amount">₹${reservation.TotalAmount ? Number(reservation.TotalAmount).toFixed(2) : 'Calculating...'}</span>
+                    </div>
                 </div>
             </div>
+            
             <div class="reservation-actions">
                 ${getReservationActions(reservation)}
             </div>

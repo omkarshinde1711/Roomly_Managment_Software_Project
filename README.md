@@ -44,7 +44,9 @@ sp_UserLogin               - Secure authentication
 
 **Real-time Room Availability**: SQL-based conflict detection with date overlap logic  
 **Complete Reservation Lifecycle**: Create → Check-in → Check-out → Bill Generation  
-**Alternative Room Suggestions**: Smart recommendations when rooms unavailable  
+**Alternative Room Suggestions**: Smart recommendations when preferred rooms unavailable  
+**Hotel Information Display**: Hotel names shown in all reservation cards for better context  
+**Interactive Room Selection**: Click-to-select alternative rooms with detailed information  
 **User Authentication**: Role-based access (Admin/Staff) with session management  
 **Automated Billing**: Dynamic calculation based on stay duration and room rates
 
@@ -131,9 +133,11 @@ Staff: staff1 / staff123
 ```
 POST /api/login                    - User authentication
 GET  /api/hotels                   - Retrieve hotels with rooms
-POST /api/check-availability       - Real-time availability check
+GET  /api/hotels/:id/rooms         - Get rooms by specific hotel
+POST /api/rooms/availability       - Real-time availability check
+POST /api/rooms/available          - Get alternative available rooms
 POST /api/reservations             - Create new reservation
-GET  /api/reservations             - Get all reservations
+GET  /api/reservations             - Get all reservations with hotel details
 POST /api/checkin/:id              - Guest check-in
 POST /api/checkout/:id             - Check-out with billing
 DELETE /api/reservations/:id       - Cancel reservation
@@ -152,10 +156,12 @@ GET  /api/bills/:reservationId     - Retrieve bill details
 ## Testing Scenarios
 
 **Double Booking Prevention**: Overlapping date conflict detection  
-**Availability Accuracy**: Real-time status verification  
+**Availability Accuracy**: Real-time status verification with alternative suggestions  
 **Bill Calculation**: Rate × nights validation  
-**Alternative Suggestions**: Available room recommendations  
-**Status Workflow**: Reservation lifecycle management
+**Alternative Room Display**: Available room recommendations with hotel context  
+**Hotel Information**: Hotel names visible in all reservation displays  
+**Interactive Selection**: Alternative room click-to-select functionality  
+**Status Workflow**: Complete reservation lifecycle management
 
 ## Developer Information
 
@@ -165,3 +171,24 @@ GET  /api/bills/:reservationId     - Retrieve bill details
 **Completion**: 95% - Production ready
 
 This project demonstrates advanced SQL database design, comprehensive stored procedure implementation, and real-world business logic handling in a hotel management context.
+
+## User Interface Features
+
+### Current Reservations Page
+- **Hotel Names**: Each reservation card displays the associated hotel name for better context
+- **Complete Details**: Room number, dates, rates, and total amount clearly displayed
+- **Status Management**: Visual status badges with appropriate action buttons
+- **Responsive Design**: Clean card layout adapts to different screen sizes
+
+### Check Room Availability Page
+- **Real-time Validation**: Instant availability checking with detailed feedback
+- **Alternative Suggestions**: When rooms unavailable, displays grid of alternative options
+- **Interactive Selection**: Click any alternative room card to automatically select it
+- **Detailed Room Info**: Each alternative shows room type, rate, capacity, and hotel name
+- **Smart Filtering**: Alternatives filtered by hotel and date availability
+
+### Enhanced User Experience
+- **Visual Feedback**: Color-coded availability results (green/red)
+- **Hover Effects**: Interactive room cards with smooth transitions
+- **Loading States**: Visual indicators during API calls
+- **Error Handling**: Clear error messages with fallback options

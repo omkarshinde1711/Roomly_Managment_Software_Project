@@ -139,6 +139,38 @@ app.post('/api/available-rooms', async (req, res) => {
     }
 });
 
+// Get Available Rooms - Alternative endpoint path
+app.post('/api/rooms/available', async (req, res) => {
+    console.log('=== Alternative Rooms Endpoint Hit ===');
+    console.log('Request headers:', req.headers);
+    console.log('Request body:', req.body);
+    
+    try {
+        const { hotelId, checkInDate, checkOutDate, roomType } = req.body;
+        
+        console.log('Fetching available rooms for:', { hotelId, checkInDate, checkOutDate, roomType });
+        
+        const [rows] = await pool.execute('CALL sp_GetAvailableRooms(?, ?, ?, ?)', 
+            [hotelId || null, checkInDate, checkOutDate, roomType || null]);
+        
+        console.log('Query result rows:', rows[0]);
+        
+        const response = {
+            success: true,
+            rooms: rows[0]
+        };
+        
+        console.log('Sending response:', response);
+        res.json(response);
+    } catch (err) {
+        console.error('Get available rooms error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+});
+
 // 5. Create Reservation
 app.post('/api/reservations', async (req, res) => {
     try {
