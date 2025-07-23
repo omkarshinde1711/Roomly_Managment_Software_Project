@@ -225,6 +225,8 @@ async function updateRoomsList() {
     const hotelId = document.getElementById('availHotel').value;
     const roomSelect = document.getElementById('availRoom');
     
+    console.log('Updating rooms list for hotel:', hotelId);
+    
     if (!hotelId) {
         roomSelect.innerHTML = '<option value="">Select Room</option>';
         return;
@@ -237,9 +239,16 @@ async function updateRoomsList() {
         
         if (response.ok) {
             const data = await response.json();
+            console.log('Rooms loaded:', data);
             populateRoomSelect(roomSelect, data.rooms || []);
         } else {
-            console.error('Failed to load rooms');
+            console.error('Failed to load rooms - response not ok');
+            // Fallback to demo data
+            const demoRooms = [
+                { RoomID: 1, RoomNumber: '101', RoomType: 'Single', RatePerNight: 100 },
+                { RoomID: 2, RoomNumber: '102', RoomType: 'Double', RatePerNight: 150 }
+            ];
+            populateRoomSelect(roomSelect, demoRooms);
         }
     } catch (error) {
         console.error('Error loading rooms:', error);
@@ -289,6 +298,8 @@ async function checkRoomAvailability() {
     const checkIn = document.getElementById('availCheckIn').value;
     const checkOut = document.getElementById('availCheckOut').value;
     
+    console.log('Availability check inputs:', { hotelId, roomId, checkIn, checkOut });
+    
     if (!hotelId || !roomId || !checkIn || !checkOut) {
         showAvailabilityResult('Please fill in all fields', false);
         return;
@@ -313,8 +324,9 @@ async function checkRoomAvailability() {
         });
         
         const data = await response.json();
+        console.log('Availability response:', data);
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             showAvailabilityResult(
                 data.available ? 'Room is available!' : 'Room is not available for selected dates',
                 data.available
@@ -324,16 +336,12 @@ async function checkRoomAvailability() {
                 showAlternativeRooms(data.alternatives);
             }
         } else {
+            console.error('Availability check failed:', data);
             showAvailabilityResult(data.message || 'Error checking availability', false);
         }
     } catch (error) {
         console.error('Error checking availability:', error);
-        // Demo logic
-        const isAvailable = Math.random() > 0.3; // 70% chance of availability
-        showAvailabilityResult(
-            isAvailable ? 'Room is available!' : 'Room is not available for selected dates',
-            isAvailable
-        );
+        showAvailabilityResult('Network error - please try again', false);
     } finally {
         showLoading(false);
     }
@@ -444,7 +452,13 @@ function createReservationCard(reservation) {
                     <span class="detail-label">Check-out:</span> ${formatDate(reservation.CheckOutDate)}
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Total:</span> $${reservation.TotalAmount}
+                    <span class="detail-label">Rate:</span> $${reservation.RatePerNight ? Number(reservation.RatePerNight).toFixed(2) : 'N/A'}/night
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Nights:</span> ${reservation.NumberOfNights || 'N/A'}
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Total:</span> $${reservation.TotalAmount ? Number(reservation.TotalAmount).toFixed(2) : 'Calculating...'}
                 </div>
             </div>
             <div class="reservation-actions">

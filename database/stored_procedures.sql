@@ -213,6 +213,9 @@ BEGIN
         res.Status,
         r.RoomNumber,
         r.RoomType,
+        r.RatePerNight,
+        DATEDIFF(res.CheckOutDate, res.CheckInDate) AS NumberOfNights,
+        (r.RatePerNight * DATEDIFF(res.CheckOutDate, res.CheckInDate)) AS TotalAmount,
         h.Name AS HotelName,
         u.Username AS CreatedBy
     FROM Reservations res

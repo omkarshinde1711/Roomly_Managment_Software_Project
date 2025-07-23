@@ -305,12 +305,21 @@ app.post('/api/rooms/availability', async (req, res) => {
     try {
         const { roomId, checkInDate, checkOutDate } = req.body;
         
+        console.log('Checking availability for:', { roomId, checkInDate, checkOutDate });
+        
         const [rows] = await pool.execute('CALL sp_CheckRoomAvailability(?, ?, ?)', 
             [roomId, checkInDate, checkOutDate]);
         
+        console.log('Availability check result:', rows[0][0]);
+        
+        const result = rows[0][0];
+        const isAvailable = result.AvailabilityStatus === 'Available';
+        
         res.json({
             success: true,
-            availability: rows[0][0]
+            available: isAvailable,
+            status: result.AvailabilityStatus,
+            conflictingReservations: result.ConflictingReservations
         });
     } catch (err) {
         console.error('Check room availability error:', err);
