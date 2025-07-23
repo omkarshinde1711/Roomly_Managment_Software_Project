@@ -6,9 +6,13 @@
 
 SQL-focused hotel management system demonstrating comprehensive database design, stored procedures, and real-time availability checking.
 
-## Video Demonstration
 
-<img width="1827" height="1039" alt="Roomly Dashboard" src="https://github.com/user-attachments/assets/83fcee28-2c95-4cd6-aad8-747c6804f54d" />
+## SnapShot
+
+<img width="1833" height="2349" alt="Roomly Dashboard" src="https://github.com/user-attachments/assets/906b3d7e-7447-408f-9dd1-ddfd7cdae0b3" />
+
+
+## Video Demonstration
 
 [![Roomly Management System Demo](https://img.shields.io/badge/Watch-Demo%20Video-red?style=for-the-badge&logo=youtube)](URL_TO_YOUR_VIDEO)
 
