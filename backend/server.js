@@ -141,27 +141,16 @@ app.post('/api/available-rooms', async (req, res) => {
 
 // Get Available Rooms - Alternative endpoint path
 app.post('/api/rooms/available', async (req, res) => {
-    console.log('=== Alternative Rooms Endpoint Hit ===');
-    console.log('Request headers:', req.headers);
-    console.log('Request body:', req.body);
-    
     try {
         const { hotelId, checkInDate, checkOutDate, roomType } = req.body;
-        
-        console.log('Fetching available rooms for:', { hotelId, checkInDate, checkOutDate, roomType });
         
         const [rows] = await pool.execute('CALL sp_GetAvailableRooms(?, ?, ?, ?)', 
             [hotelId || null, checkInDate, checkOutDate, roomType || null]);
         
-        console.log('Query result rows:', rows[0]);
-        
-        const response = {
+        res.json({
             success: true,
             rooms: rows[0]
-        };
-        
-        console.log('Sending response:', response);
-        res.json(response);
+        });
     } catch (err) {
         console.error('Get available rooms error:', err);
         res.status(500).json({
@@ -337,12 +326,8 @@ app.post('/api/rooms/availability', async (req, res) => {
     try {
         const { roomId, checkInDate, checkOutDate } = req.body;
         
-        console.log('Checking availability for:', { roomId, checkInDate, checkOutDate });
-        
         const [rows] = await pool.execute('CALL sp_CheckRoomAvailability(?, ?, ?)', 
             [roomId, checkInDate, checkOutDate]);
-        
-        console.log('Availability check result:', rows[0][0]);
         
         const result = rows[0][0];
         const isAvailable = result.AvailabilityStatus === 'Available';

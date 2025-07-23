@@ -25,22 +25,15 @@ function checkAuthentication() {
     const token = localStorage.getItem('hms_token');
     const user = localStorage.getItem('hms_user');
     
-    console.log('Checking authentication:', { token: !!token, user }); // Debug log
-    
     if (!token || !user) {
-        // Not authenticated, redirect to login
         window.location.href = 'index.html';
         return;
     }
     
     try {
         currentUser = JSON.parse(user);
-        console.log('Parsed user:', currentUser); // Debug log
         
-        // Check if user data has the correct fields
         if (!currentUser.UserID && currentUser.userID) {
-            // Migrate old user data format
-            console.log('Migrating old user data format');
             currentUser.UserID = currentUser.userID;
             currentUser.Username = currentUser.username || currentUser.Username;
             currentUser.Role = currentUser.role || currentUser.Role;
@@ -49,7 +42,6 @@ function checkAuthentication() {
         
         updateUserDisplay();
         
-        // Show management tab for admin users
         if (currentUser.Role === 'Admin') {
             const managementTab = document.getElementById('managementTab');
             if (managementTab) {
@@ -64,14 +56,9 @@ function checkAuthentication() {
 
 function updateUserDisplay() {
     if (currentUserSpan && currentUser) {
-        console.log('Current user object:', currentUser); // Debug log
-        
-        // Use the normalized property names
         const displayName = currentUser.name || currentUser.Username || 'User';
-        
         currentUserSpan.textContent = `Welcome, ${displayName}`;
     } else {
-        console.log('Missing currentUserSpan or currentUser:', { currentUserSpan, currentUser });
         if (currentUserSpan) {
             currentUserSpan.textContent = 'Welcome, Guest';
         }
@@ -225,8 +212,6 @@ async function updateRoomsList() {
     const hotelId = document.getElementById('availHotel').value;
     const roomSelect = document.getElementById('availRoom');
     
-    console.log('Updating rooms list for hotel:', hotelId);
-    
     if (!hotelId) {
         roomSelect.innerHTML = '<option value="">Select Room</option>';
         return;
@@ -239,23 +224,18 @@ async function updateRoomsList() {
         
         if (response.ok) {
             const data = await response.json();
-            console.log('Rooms loaded:', data);
             populateRoomSelect(roomSelect, data.rooms || []);
         } else {
-            console.error('Failed to load rooms - response not ok');
-            // Fallback to demo data
             const demoRooms = [
-                { RoomID: 1, RoomNumber: '101', RoomType: 'Single', RatePerNight: 100 },
-                { RoomID: 2, RoomNumber: '102', RoomType: 'Double', RatePerNight: 150 }
+                { RoomID: 1, RoomNumber: '101', RoomType: 'Single', RatePerNight: 8299 },
+                { RoomID: 2, RoomNumber: '102', RoomType: 'Double', RatePerNight: 12449 }
             ];
             populateRoomSelect(roomSelect, demoRooms);
         }
     } catch (error) {
-        console.error('Error loading rooms:', error);
-        // Demo data
         const demoRooms = [
-            { RoomID: 1, RoomNumber: '101', RoomType: 'Single', RatePerNight: 100 },
-            { RoomID: 2, RoomNumber: '102', RoomType: 'Double', RatePerNight: 150 }
+            { RoomID: 1, RoomNumber: '101', RoomType: 'Single', RatePerNight: 8299 },
+            { RoomID: 2, RoomNumber: '102', RoomType: 'Double', RatePerNight: 12449 }
         ];
         populateRoomSelect(roomSelect, demoRooms);
     }
@@ -282,14 +262,8 @@ function populateRoomSelect(select, rooms) {
         const option = document.createElement('option');
         option.value = room.RoomID;
         option.textContent = `${room.RoomNumber} - ${room.RoomType} (₹${room.RatePerNight}/night)`;
-        // Explicitly set styles to ensure visibility
-        option.style.color = '#495057';
-        option.style.backgroundColor = 'white';
         select.appendChild(option);
     });
-    // Ensure the select element itself has proper styling
-    select.style.color = '#495057';
-    select.style.backgroundColor = 'white';
 }
 
 async function checkRoomAvailability() {
@@ -297,8 +271,6 @@ async function checkRoomAvailability() {
     const roomId = document.getElementById('availRoom').value;
     const checkIn = document.getElementById('availCheckIn').value;
     const checkOut = document.getElementById('availCheckOut').value;
-    
-    console.log('Availability check inputs:', { hotelId, roomId, checkIn, checkOut });
     
     if (!hotelId || !roomId || !checkIn || !checkOut) {
         showAvailabilityResult('Please fill in all fields', false);
@@ -324,7 +296,6 @@ async function checkRoomAvailability() {
         });
         
         const data = await response.json();
-        console.log('Availability response:', data);
         
         if (response.ok && data.success) {
             showAvailabilityResult(
@@ -332,22 +303,18 @@ async function checkRoomAvailability() {
                 data.available
             );
             
-            // If room is not available, fetch alternative rooms
             if (!data.available) {
                 await fetchAlternativeRooms(hotelId, checkIn, checkOut);
             } else {
-                // Clear any previous alternatives if room is available
                 const alternativesDiv = document.getElementById('alternativeRooms');
                 if (alternativesDiv) {
                     alternativesDiv.innerHTML = '';
                 }
             }
         } else {
-            console.error('Availability check failed:', data);
             showAvailabilityResult(data.message || 'Error checking availability', false);
         }
     } catch (error) {
-        console.error('Error checking availability:', error);
         showAvailabilityResult('Network error - please try again', false);
     } finally {
         showLoading(false);
@@ -365,8 +332,6 @@ function showAvailabilityResult(message, isAvailable) {
 
 async function fetchAlternativeRooms(hotelId, checkInDate, checkOutDate) {
     try {
-        console.log('Fetching alternatives for:', { hotelId, checkInDate, checkOutDate });
-        
         const response = await fetch(`${API_BASE}/rooms/available`, {
             method: 'POST',
             headers: getAuthHeaders(),
@@ -374,36 +339,16 @@ async function fetchAlternativeRooms(hotelId, checkInDate, checkOutDate) {
                 hotelId,
                 checkInDate,
                 checkOutDate,
-                roomType: null // Get all room types
+                roomType: null
             })
         });
         
-        console.log('Alternative rooms response status:', response.status);
-        console.log('Alternative rooms response headers:', response.headers.get('content-type'));
-        
-        // Get response text first to debug
-        const responseText = await response.text();
-        console.log('Raw response text:', responseText);
-        
         if (!response.ok) {
-            console.error('Response not OK:', response.status, response.statusText);
-            console.error('Error response body:', responseText);
             showNoAlternatives();
             return;
         }
         
-        // Try to parse as JSON
-        let data;
-        try {
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            console.error('Response was not valid JSON:', responseText);
-            showNoAlternatives();
-            return;
-        }
-        
-        console.log('Alternative rooms response:', data);
+        const data = await response.json();
         
         if (data.success && data.rooms && data.rooms.length > 0) {
             showAlternativeRooms(data.rooms);
@@ -411,7 +356,6 @@ async function fetchAlternativeRooms(hotelId, checkInDate, checkOutDate) {
             showNoAlternatives();
         }
     } catch (error) {
-        console.error('Error fetching alternative rooms:', error);
         showNoAlternatives();
     }
 }

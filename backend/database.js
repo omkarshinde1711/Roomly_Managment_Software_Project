@@ -7,7 +7,7 @@ const config = {
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'your_password_here',
-    // database: 'HospitalityDB', // Comment out for initial setup
+    database: process.env.DB_NAME || 'HospitalityDB',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -27,13 +27,14 @@ async function testConnection() {
         console.log('Connected to MySQL Server');
         
         // Check if database exists, create if not (using query instead of execute)
-        const [rows] = await connection.query("SHOW DATABASES LIKE 'HospitalityDB'");
+        const dbName = process.env.DB_NAME || 'HospitalityDB';
+        const [rows] = await connection.query(`SHOW DATABASES LIKE '${dbName}'`);
         if (rows.length === 0) {
-            console.log('Creating HospitalityDB database...');
-            await connection.query('CREATE DATABASE HospitalityDB');
-            console.log('✅ Database HospitalityDB created successfully!');
+            console.log(`Creating ${dbName} database...`);
+            await connection.query(`CREATE DATABASE ${dbName}`);
+            console.log(`✅ Database ${dbName} created successfully!`);
         } else {
-            console.log('✅ Database HospitalityDB already exists');
+            console.log(`✅ Database ${dbName} already exists`);
         }
         
         await connection.end();
@@ -51,10 +52,10 @@ async function testConnection() {
 // Initialize connection test
 testConnection();
 
-// Create a new pool connection specifically for HospitalityDB
+// Create a new pool connection specifically for the database
 const dbConfig = {
     ...config,
-    database: 'HospitalityDB'
+    database: process.env.DB_NAME || 'HospitalityDB'
 };
 
 const dbPool = mysql.createPool(dbConfig);
