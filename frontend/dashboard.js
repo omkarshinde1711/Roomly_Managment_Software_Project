@@ -36,6 +36,17 @@ function checkAuthentication() {
     try {
         currentUser = JSON.parse(user);
         console.log('Parsed user:', currentUser); // Debug log
+        
+        // Check if user data has the correct fields
+        if (!currentUser.UserID && currentUser.userID) {
+            // Migrate old user data format
+            console.log('Migrating old user data format');
+            currentUser.UserID = currentUser.userID;
+            currentUser.Username = currentUser.username || currentUser.Username;
+            currentUser.Role = currentUser.role || currentUser.Role;
+            localStorage.setItem('hms_user', JSON.stringify(currentUser));
+        }
+        
         updateUserDisplay();
         
         // Show management tab for admin users
@@ -186,8 +197,8 @@ async function loadHotels() {
         console.error('Error loading hotels:', error);
         // Use demo data if API is not available
         hotels = [
-            { HotelID: 1, Name: 'Grand Plaza Hotel', Address: '123 Main St' },
-            { HotelID: 2, Name: 'Ocean View Resort', Address: '456 Beach Rd' }
+            { HotelID: 1, HotelName: 'Grand Plaza Hotel', Address: '123 Main St' },
+            { HotelID: 2, HotelName: 'Ocean View Resort', Address: '456 Beach Rd' }
         ];
         populateHotelSelects();
     }
@@ -203,43 +214,9 @@ function populateHotelSelects() {
             hotels.forEach(hotel => {
                 const option = document.createElement('option');
                 option.value = hotel.HotelID;
-                option.textContent = hotel.Name;
-                // Explicitly set styles to ensure visibility
-                option.style.color = '#495057';
-                option.style.backgroundColor = 'white';
-                option.style.webkitTextFillColor = '#495057';
+                option.textContent = hotel.HotelName || hotel.Name; // Check both possible field names
                 select.appendChild(option);
             });
-            // Force styling on the select element with multiple methods
-            select.style.color = '#495057';
-            select.style.backgroundColor = 'white';
-            select.style.webkitTextFillColor = '#495057';
-            select.style.textShadow = 'none';
-            
-            // More aggressive styling approach
-            select.setAttribute('style', 'color: #495057 !important; background-color: white !important; -webkit-text-fill-color: #495057 !important;');
-            select.classList.add('force-visible-text');
-            
-            // Force browser to recalculate styles
-            setTimeout(() => {
-                const options = select.querySelectorAll('option');
-                options.forEach(opt => {
-                    opt.setAttribute('style', 'color: #495057 !important; background-color: white !important; -webkit-text-fill-color: #495057 !important;');
-                    opt.classList.add('force-visible-text');
-                });
-                
-                // Trigger a style recalculation
-                select.style.display = 'none';
-                select.offsetHeight; // Trigger reflow
-                select.style.display = '';
-                
-                // Apply styles one more time after reflow
-                select.style.color = '#495057';
-                select.style.webkitTextFillColor = '#495057';
-                
-                console.log('Hotel dropdown styled. Options count:', options.length);
-                console.log('First option text:', options[1]?.textContent, 'color:', window.getComputedStyle(options[1]).color);
-            }, 100);
         }
     });
 }
@@ -497,7 +474,10 @@ async function handleCreateReservation(e) {
     
     // Get current user info
     const currentUser = JSON.parse(localStorage.getItem('hms_user') || '{}');
+    console.log('Current user for reservation:', currentUser); // Debug log
+    
     if (!currentUser.UserID) {
+        console.log('Authentication failed - no UserID found'); // Debug log
         showReservationMessage('User authentication error. Please login again.', 'error');
         return;
     }
@@ -511,6 +491,8 @@ async function handleCreateReservation(e) {
         guestPhone: document.getElementById('guestPhone').value,
         guestEmail: document.getElementById('guestEmail').value
     };
+    
+    console.log('Form data for reservation:', formData); // Debug log
     
     if (!validateReservationForm(formData)) return;
     

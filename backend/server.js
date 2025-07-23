@@ -30,9 +30,9 @@ app.post('/api/login', async (req, res) => {
             
             // Normalize the user data for frontend consistency
             const normalizedUser = {
-                userID: userData.UserID,
-                username: userData.Username,
-                role: userData.Role,
+                UserID: userData.UserID,
+                Username: userData.Username,
+                Role: userData.Role,
                 name: userData.Username // Use username as display name
             };
             
