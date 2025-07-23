@@ -52,7 +52,7 @@ sp_UserLogin               - Secure authentication
 **Hotel Information Display**: Hotel names shown in all reservation cards for better context  
 **Interactive Room Selection**: Click-to-select alternative rooms with detailed information  
 **User Authentication**: Role-based access (Admin/Staff) with session management  
-**Automated Billing**: Dynamic calculation based on stay duration and room rates
+**Automated Billing**: Dynamic calculation based on stay duration and room rates 
 
 ## SQL Highlights
 
